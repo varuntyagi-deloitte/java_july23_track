@@ -14,10 +14,10 @@ public class ArrayPalindromeCheck {
             String ele = sc.next();
             arr.add(ele);
         }
-        for (int i = 0; i < arr.size(); i++) {
+        for (String s : arr) {
             String reverse = "";
-            for (int j = arr.get(i).length() - 1; j >= 0; j--) {
-                reverse = reverse + arr.get(i).charAt(j);
+            for (int j = s.length() - 1; j >= 0; j--) {
+                reverse = reverse + s.charAt(j);
             }
             arr1.add(reverse.trim());
         }
