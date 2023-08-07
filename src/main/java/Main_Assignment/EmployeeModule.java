@@ -177,8 +177,8 @@ public class EmployeeModule {
             Log.info("3. Return to previous menu");
             Log.info("Enter the choice regarding modification details:");
             modifyChoice = input.nextInt();
+            double basic,hra,lta,vpf,pf,Ctc,sodexo,specialAllowance;
             switch (modifyChoice) {
-
                 // Case 1 for Modifying the Sodexo
                 case 1 :
                     double checkSodexo = Double.parseDouble(dataRead(empId, 7));
@@ -187,8 +187,6 @@ public class EmployeeModule {
                         String sodexoAns = input.next();
                         if (sodexoAns.equals("Y") || sodexoAns.equals("y")) {
                             cellUpdate(empId, 0, 7);
-                            double specialAllowance = Double.parseDouble(dataRead(empId,10));
-                            cellUpdate(empId, (specialAllowance+2200), 10);
                             Log.info("Sodexo opted Out. Same updated in the employee sheet.!");
                         } else if (sodexoAns.equals("N") || sodexoAns.equals("n")) {
                             Log.info("No changes were made in your salary.");
@@ -200,8 +198,6 @@ public class EmployeeModule {
                         String sodexoAns = input.next();
                         if (sodexoAns.equals("Y") || sodexoAns.equals("y")) {
                             cellUpdate(empId, 2200, 7);
-                            double specialAllowance = Double.parseDouble(dataRead(empId,10));
-                            cellUpdate(empId, (specialAllowance-2200), 10);
                             Log.info("Sodexo opted In. Same updated in the employee sheet.!");
                         } else if (sodexoAns.equals("N") || sodexoAns.equals("n")) {
                             Log.info("No changes were made in your salary.");
@@ -209,6 +205,16 @@ public class EmployeeModule {
                             Log.info("Please enter a valid answer i.e., it should be in Y or N");
                         }
                     }
+                    basic = Double.parseDouble(dataRead(empId,4));
+                    Ctc = Double.parseDouble(dataRead(empId,3));
+                    hra = Double.parseDouble(dataRead(empId,5));
+                    lta = Double.parseDouble(dataRead(empId,6));
+                    pf = Double.parseDouble(dataRead(empId,8));
+                    vpf = Double.parseDouble(dataRead(empId,9));
+                    sodexo = Double.parseDouble(dataRead(empId,7));
+                    specialAllowance = Ctc-(basic+hra+lta+pf+sodexo+vpf);
+                    cellUpdate(empId, specialAllowance, 10);
+                    Log.info("Special Allowance got updated");
                     break;
 
                 // Case 2 for the VPF
@@ -221,14 +227,16 @@ public class EmployeeModule {
                         if(vpfPer.endsWith("%")) {
                             cellFormulaUpdate(empId, vpfPer, 9);
                             Log.info("VPF percentage updated successfully!");
-//                            double Ctc = Double.parseDouble(dataRead(empId,3));
-//                            double hra = Double.parseDouble(dataRead(empId,5));
-//                            double lta = Double.parseDouble(dataRead(empId,6));
-//                            double pf = Double.parseDouble(dataRead(empId,8));
-//                            double sodexo = Double.parseDouble(dataRead(empId,7));
-//                            double specialAllowance = Ctc-(hra+lta+pf+sodexo);
-//                            cellUpdate(empId, specialAllowance, 10);
-//                            Log.info("Special Allowance got updated");
+                            basic = Double.parseDouble(dataRead(empId,4));
+                            Ctc = Double.parseDouble(dataRead(empId,3));
+                            hra = Double.parseDouble(dataRead(empId,5));
+                            lta = Double.parseDouble(dataRead(empId,6));
+                            pf = Double.parseDouble(dataRead(empId,8));
+                            vpf = Double.parseDouble(dataRead(empId,9));
+                            sodexo = Double.parseDouble(dataRead(empId,7));
+                            specialAllowance = Ctc-(basic+hra+lta+pf+sodexo+vpf);
+                            cellUpdate(empId, specialAllowance, 10);
+                            Log.info("Special Allowance got updated");
                         }
                         else{
                             Log.info("Value entered for Vpf is invalid. Example FORMAT: XX%");
