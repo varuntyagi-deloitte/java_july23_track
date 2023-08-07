@@ -73,9 +73,9 @@ public class RowFormula {
             String formula3 = "E" + lastIndex + "*" + properties.getProperty("vpf");
             cell10.setCellFormula(formula3);
 
-            // Emp Special Allowance cell K which is D-E-F-G-H-I
+            // Emp Special Allowance cell K which is D-(E+F+G+H+I+J)
             Cell cell11 = newRow.createCell(10);
-            String formula4 = "D" + lastIndex + "-(E" + lastIndex + "+F" + lastIndex + "+G" + lastIndex + "+H" + lastIndex + "+I" + lastIndex + ")";
+            String formula4 = "D" + lastIndex + "-(E" + lastIndex + "+F" + lastIndex + "+G" + lastIndex + "+H" + lastIndex + "+I" + lastIndex + "+J" + lastIndex + ")";
             cell11.setCellFormula(formula4);
 
             FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
@@ -117,6 +117,7 @@ public class RowFormula {
             System.out.println("Error Occurred in Updating the Basic Percentage");
         }
     }
+
     public static void hraUpdate(String percentage) {
         int columnNumber = 5;
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath))) {
@@ -141,9 +142,8 @@ public class RowFormula {
     }
 
     // This method is used to update any specific cell value
-    public static void  cellUpdate(String referenceCell, double newValue, int cellNumber) {
-        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath));
-             FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+    public static void cellUpdate(String referenceCell, double newValue, int cellNumber) {
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath))) {
 
             Sheet sheet = workbook.getSheet(sheetName);
 
@@ -159,72 +159,53 @@ public class RowFormula {
                     }
                 }
             }
-            workbook.write(fos);
-
+            try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+                workbook.write(fos);
+            }
         } catch (IOException e) {
             System.out.println("Error occurred in Update block!!!");
         }
     }
 
-    //    public static void vpfUpdate(String referenceCell,String percentage,int cellNumber) {
-//        int columnNumber = 9;
-//        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath))) {
-//            Sheet sheet = workbook.getSheet(sheetName);
-//            for (int rowIdx = 1; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
-//                Row row = sheet.getRow(rowIdx);
-//                Cell cell = row.getCell(columnNumber, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-//                int formulaIdx = rowIdx + 1;
-//
-//                String formula = "D" + formulaIdx + "*" + percentage;
-//                cell.setCellFormula(formula);
-//
-//                FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
-//                formulaEvaluator.evaluateFormulaCell(cell);
-//            }
+    // This method is used to update the formula for a specific cell.
+    public static void cellFormulaUpdate(String referenceCell, String percentage, int cellNumber) {
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath))) {
+
+            Sheet sheet = workbook.getSheet(sheetName);
+
 //            for (Row row : sheet) {
 //                for (Cell cell : row) {
 //                    if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equals(referenceCell)) {
 //                        Cell targetCell = row.getCell(cell.getColumnIndex() + cellNumber);
 //                        Cell basicCell = row.getCell(cell.getColumnIndex() + 4);
+//                        Cell cell_formula_update = row.getCell(targetCell.getColumnIndex(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 //
-//                        if (targetCell != null) {
-//                            String formula = "E" + basicCell + "*" + percentage;
-//                            targetCell.setCellFormula(formula);
-//                        }
+//                        String formula = "E" + basicCell.getColumnIndex() + "*" + percentage;
+//                        targetCell.setCellFormula(formula);
+//                        FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
+//                        formulaEvaluator.evaluateFormulaCell(cell_formula_update);
 //                        break;
 //                    }
 //                }
 //            }
-//            try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
-//                workbook.write(fos);
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Error Occurred in Updating the Basic Percentage");
-//        }
-//    }
-    // This method is used to update the formula for a specific cell.
-    public static void cellFormulaUpdate(String referenceCell, String percentage, int cellNumber) {
-        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath));
-             FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+            for (int rowIdx = 1; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+                Row row = sheet.getRow(rowIdx);
+                Cell cell_emp_id = row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                if (cell_emp_id.getCellType() == CellType.STRING && cell_emp_id.getStringCellValue().equals(referenceCell)) {
+                    int formulaIdx = rowIdx + 1;
+                    Cell cell = row.getCell(cellNumber, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-            Sheet sheet = workbook.getSheet(sheetName);
+                    String formula = "E" + formulaIdx + "*" + percentage;
+                    cell.setCellFormula(formula);
 
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equals(referenceCell)) {
-                        Cell targetCell = row.getCell(cell.getColumnIndex() + cellNumber);
-                        Cell basicCell = row.getCell(cell.getColumnIndex() + 4);
-
-                        if (targetCell != null) {
-                            String formula = "E" + basicCell + "*" + percentage;
-                            targetCell.setCellFormula(formula);
-                        }
-                        break;
-                    }
+                    FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
+                    formulaEvaluator.evaluateFormulaCell(cell);
+                    break;
                 }
             }
-            workbook.write(fos);
-
+            try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+                workbook.write(fos);
+            }
         } catch (IOException e) {
             System.out.println("Error occurred in Update block!!!");
         }
@@ -250,21 +231,21 @@ public class RowFormula {
         return flag == 1;
     }
 
-    public static String dataRead(String reference, int cellNumber){
+    public static String dataRead(String reference, int cellNumber) {
         String targetValue = "";
 
-        try(Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath))){
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(excelFilePath))) {
             Sheet sheet = workbook.getSheet(sheetName);
 
-            for (Row row: sheet){
-                for (Cell cell: row){
-                    if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equals(reference)){
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equals(reference)) {
                         Cell targetCell = row.getCell(cell.getColumnIndex() + cellNumber);
                         FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
                         CellValue cellValue = evaluator.evaluate(targetCell);
 
-                        if (cellValue != null){
-                            if (cellValue.getCellType() == CellType.STRING){
+                        if (cellValue != null) {
+                            if (cellValue.getCellType() == CellType.STRING) {
                                 targetValue = cellValue.getStringValue();
                             } else if (cellValue.getCellType() == CellType.NUMERIC) {
                                 double intTargetValue = cellValue.getNumberValue();
@@ -280,7 +261,7 @@ public class RowFormula {
                     }
                 }
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Error in the Data Reading");
         }
         return targetValue;
