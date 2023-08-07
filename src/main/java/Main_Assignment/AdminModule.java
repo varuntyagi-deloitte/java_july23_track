@@ -106,33 +106,39 @@ public class AdminModule {
 
                 // Case 2 for updating the Employee Basic Percentage
                 case 2:
-                    Log.info("Enter the new Basic Percentage (should be less than or equal to 100)");
-                    String newBasic = input.next();
-                    try (InputStream op = new FileInputStream(PROP_LOC)) {
-                        properties.load(op);
-                        properties.setProperty("basic", newBasic);
-                        try (OutputStream outputStream = new FileOutputStream(PROP_LOC)) {
-                            if (newBasic.endsWith("%")) {
-                                properties.store(outputStream, "Updated Configuration");
-                                basicUpdate(properties.getProperty("basic"));
-                                Log.info("Basic got updated");
-                                hraUpdate(properties.getProperty("hra"));
-                                Log.info("HRA got updated");
-                                double basic = Double.parseDouble(dataRead(empId,4));
-                                double Ctc = Double.parseDouble(dataRead(empId,3));
-                                double hra = Double.parseDouble(dataRead(empId,5));
-                                double lta = Double.parseDouble(dataRead(empId,6));
-                                double pf = Double.parseDouble(dataRead(empId,8));
-                                double sodexo = Double.parseDouble(dataRead(empId,7));
-                                double specialAllowance = Ctc-(hra+lta+pf+sodexo+basic);
-                                cellUpdate(empId, specialAllowance, 10);
-                                Log.info("Special Allowance got updated");
-                            } else {
-                                Log.info("Value entered for Basic is invalid. Example FORMAT: XX%");
+                    if (dataReadValidation(empId, 0)) {
+                        Log.info("Enter the new Basic Percentage (should be less than or equal to 100)");
+                        String newBasic = input.next();
+                        try (InputStream op = new FileInputStream(PROP_LOC)) {
+                            properties.load(op);
+                            properties.setProperty("basic", newBasic);
+                            try (OutputStream outputStream = new FileOutputStream(PROP_LOC)) {
+                                if (newBasic.endsWith("%")) {
+                                    properties.store(outputStream, "Updated Configuration");
+                                    basicUpdate(properties.getProperty("basic"));
+                                    Log.info("Basic got updated");
+                                    hraUpdate(properties.getProperty("hra"));
+                                    Log.info("HRA got updated");
+                                    double basic = Double.parseDouble(dataRead(empId, 4));
+                                    double Ctc = Double.parseDouble(dataRead(empId, 3));
+                                    double hra = Double.parseDouble(dataRead(empId, 5));
+                                    double lta = Double.parseDouble(dataRead(empId, 6));
+                                    double pf = Double.parseDouble(dataRead(empId, 8));
+                                    double sodexo = Double.parseDouble(dataRead(empId, 7));
+                                    double specialAllowance = Ctc - (hra + lta + pf + sodexo + basic);
+                                    cellUpdate(empId, specialAllowance, 10);
+                                    Log.info("Special Allowance got updated");
+                                } else {
+                                    Log.info("Value entered for Basic is invalid. Example FORMAT: XX%");
+                                }
                             }
+                        } catch (IOException e) {
+                            Log.error("Error Occurred while updating the Basic.");
                         }
-                    } catch (IOException e) {
-                        Log.error("Error Occurred while updating the Basic.");
+                    }
+                    else{
+                        Log.info("Np such employee found");
+                        Log.error("Employee Id doesn't exists");
                     }
                     break;
                 case 3:
